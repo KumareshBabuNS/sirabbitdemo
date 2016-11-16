@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:int="http://www.springframework.org/schema/integration"
+       xmlns:int-amqp="http://www.springframework.org/schema/integration/amqp"
+       xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xmlns:int-stream="http://www.springframework.org/schema/integration/stream"
+       xsi:schemaLocation="http://www.springframework.org/schema/integration/amqp http://www.springframework.org/schema/integration/amqp/spring-integration-amqp.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/integration/stream http://www.springframework.org/schema/integration/stream/spring-integration-stream.xsd
+		http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
+
+    <!-- RabbitMQ to stdout -->
+    <int-amqp:inbound-channel-adapter channel="fromRabbit"
+                                      queue-names="vgdemo.inputqueue" connection-factory="connectionFactory" />
+
+    <int:channel id="fromRabbit">
+        <int:interceptors>
+            <int:wire-tap channel="loggingChannel" />
+        </int:interceptors>
+    </int:channel>
+
+
+    <int:transformer input-channel="fromRabbit" output-channel="toXMLSerializer" ref="dbloader" method="loadData" />
+
+    <int:channel id="toXMLSerializer">
+        <int:interceptors>
+            <int:wire-tap channel="loggingChannel" />
+        </int:interceptors>
+    </int:channel>
+
+    <int:transformer input-channel="toXMLSerializer" output-channel="toRabbit" ref="marshallingTransformer" method="doTransform" />
+
+    <int:channel id="toRabbit">
+        <int:interceptors>
+            <int:wire-tap channel="loggingChannel" />
+        </int:interceptors>
+    </int:channel>
+
+    <int-amqp:outbound-channel-adapter
+            channel="toRabbit" amqp-template="amqpTemplate" exchange-name="vgdemo.exchange"
+            routing-key="vgdemo.outputbinding" />
+
+    <int:logging-channel-adapter id="loggingChannel" log-full-message="true" logger-name="tapInbound"
+                                 level="INFO" />
+
+    <!-- Infrastructure -->
+
+    <rabbit:connection-factory id="connectionFactory" host="localhost" />
+
+    <rabbit:template id="amqpTemplate" connection-factory="connectionFactory" />
+
+    <rabbit:admin connection-factory="connectionFactory" />
+
+    <rabbit:queue name="vgdemo.inputqueue" />
+    <rabbit:queue name="vgdemo.outputqueue" />
+
+    <rabbit:direct-exchange name="vgdemo.exchange">
+        <rabbit:bindings>
+            <rabbit:binding queue="vgdemo.inputqueue" key="vgdemo.inputbinding" />
+            <rabbit:binding queue="vgdemo.outputqueue" key="vgdemo.outputbinding" />
+        </rabbit:bindings>
+    </rabbit:direct-exchange>
+
+    <bean id="dbloader" class="io.pivotal.vgpoccode.rabbitboot.ProcessorApplication.DBLoader" />
+
+    <bean id="marshallingTransformer" class="org.springframework.integration.xml.transformer.MarshallingTransformer">
+        <constructor-arg>
+            <bean class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
+                <property name="classesToBeBound" value="io.pivotal.vgpoccode.rabbitboot.TestData"/>
+            </bean>
+        </constructor-arg>
+        <constructor-arg>
+            <bean class="org.springframework.integration.xml.transformer.ResultToStringTransformer"/>
+        </constructor-arg>
+    </bean>
+
+    <jpa:repositories base-package="io.pivotal.vgpoccode.rabbitboot"/>
+</beans>

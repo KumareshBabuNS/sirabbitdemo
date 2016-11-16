@@ -1,0 +1,11 @@
+---
+applications:
+- name: rabbit-receiver
+  memory: 512M
+  instances: 1
+  host: rabbit-receiver
+  path: target/receiver-0.0.1-SNAPSHOT.jar
+  buildpack: java_buildpack
+  health-check-type: none
+  services:
+  - rabbitmq-service

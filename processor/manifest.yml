@@ -1,0 +1,12 @@
+---
+applications:
+- name: rabbit-processor
+  memory: 512M
+  instances: 1
+  host: rabbit-processor
+  path: target/processor-0.0.1-SNAPSHOT.jar
+  buildpack: java_buildpack
+  health-check-type: none
+  services:
+  - rabbitmq-service
+  - mysql-service

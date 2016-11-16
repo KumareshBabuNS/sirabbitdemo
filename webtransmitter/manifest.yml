@@ -1,0 +1,10 @@
+---
+applications:
+- name: rabbit-webtransmitter
+  memory: 512M
+  instances: 1
+  host: rabbit-webtransmitter
+  path: target/webtransmitter-0.0.1-SNAPSHOT.jar
+  buildpack: java_buildpack
+  services:
+  - rabbitmq-service

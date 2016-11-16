@@ -1,0 +1,23 @@
+---
+memory: 512M
+instances: 1
+buildpack: java_buildpack
+applications:
+- name: rabbit-receiver
+  no-route: true
+  path: receiver/target/receiver-0.0.1-SNAPSHOT.jar
+  health-check-type: none
+  services:
+  - rabbitmq-service
+- name: rabbit-processor
+  no-route: true
+  path: processor/target/processor-0.0.1-SNAPSHOT.jar
+  health-check-type: none
+  services:
+  - rabbitmq-service
+  - mysql-service
+- name: rabbit-webtransmitter
+  host: rabbit-webtransmitter
+  path: webtransmitter/target/webtransmitter-0.0.1-SNAPSHOT.jar
+  services:
+  - rabbitmq-service
