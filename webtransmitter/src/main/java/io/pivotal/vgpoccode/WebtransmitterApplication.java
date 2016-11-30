@@ -16,33 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootApplication
 public class WebtransmitterApplication {
-    private static final String SENDER_QUEUE = "vgdemo.inputqueue";
 
 	public static void main(String[] args) {
 		SpringApplication.run(WebtransmitterApplication.class, args);
 	}
 
-	@RestController
-	public static class TransmitterController {
-        private static final Logger LOGGER = Logger.getLogger(TransmitterController.class);
-
-        @Autowired
-        public TransmitterController(RabbitTemplate rabbitTemplate) {
-            this.rabbitTemplate = rabbitTemplate;
-        }
-
-        private RabbitTemplate rabbitTemplate;
-
-        @RequestMapping(value = "/", method = RequestMethod.GET)
-        public String usage() {
-            return "Usage: curl http://appurl/<dataid>";
-        }
-
-        @RequestMapping(value = "/{key}", method = RequestMethod.GET)
-        public String sendMessage(@PathVariable("key") String key) {
-            LOGGER.info("Sending message " + key);
-            rabbitTemplate.convertAndSend(SENDER_QUEUE, key);
-            return "Success! " + key;
-        }
-    }
 }

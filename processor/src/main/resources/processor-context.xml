@@ -64,7 +64,7 @@
         </rabbit:bindings>
     </rabbit:direct-exchange>
 
-    <bean id="dbloader" class="io.pivotal.vgpoccode.rabbitboot.ProcessorApplication.DBLoader" />
+    <bean id="dbloader" class="io.pivotal.vgpoccode.rabbitboot.DBLoader" />
 
     <bean id="marshallingTransformer" class="org.springframework.integration.xml.transformer.MarshallingTransformer">
         <constructor-arg>

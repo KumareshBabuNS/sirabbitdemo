@@ -42,22 +42,4 @@ public class ProcessorApplication {
         }
     }
 
-    public static class DBLoader {
-        private TestDataRepository testDataRepository;
-
-        @Autowired
-        public DBLoader(TestDataRepository testDataRepository) {
-            this.testDataRepository = testDataRepository;
-        }
-
-        public TestData loadData(String input) {
-            LOGGER.info("DBLoader.loadData " + input);
-            TestData result = testDataRepository.findOne(input);
-            if(result == null) {
-                return new TestData("NOT FOUND", "NOT FOUND");
-            } else {
-                return result;
-            }
-        }
-    }
 }

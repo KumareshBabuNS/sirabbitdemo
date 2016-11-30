@@ -51,4 +51,23 @@ public class TestData {
                 ", value='" + value + '\'' +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        TestData testData = (TestData) o;
+
+        if (id != null ? !id.equals(testData.id) : testData.id != null) return false;
+        return value != null ? value.equals(testData.value) : testData.value == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (value != null ? value.hashCode() : 0);
+        return result;
+    }
 }
