@@ -14,11 +14,9 @@
     <int-amqp:inbound-channel-adapter channel="consoleOut"
                                       queue-names="vgdemo.outputqueue" connection-factory="connectionFactory" />
 
-    <int:channel id="fromRabbit"/>
+    <int:channel id="consoleOut"/>
 
-    <int:transformer input-channel="fromRabbit" output-channel="consoleOut" expression="'Received: ' + payload" />
-
-    <int-stream:stdout-channel-adapter id="consoleOut"
+    <int-stream:stdout-channel-adapter channel="consoleOut"
                                        append-newline="true" />
 
 	<!-- Infrastructure -->
